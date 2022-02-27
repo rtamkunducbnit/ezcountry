@@ -1,4 +1,4 @@
-const getAllCountries = r'''
+const getCountries = r'''
 query {
   countries {
     code,

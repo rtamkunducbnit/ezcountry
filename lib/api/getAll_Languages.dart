@@ -1,13 +1,13 @@
 // ignore_for_file: file_names
 import 'package:graphql/client.dart';
-import '../models/language_model.dart';
-import '../queries/all_language_query.dart';
+import '../models/languageModel.dart';
+import '../queries/all_Language_Query.dart';
 import 'api.dart';
 
-Future<List<Languages>> getAllLanguagex() async {
+Future<List<Languages>> getLanguages() async {
   var result = await client.query(
     QueryOptions(
-      document: gql(getAllLanguage),
+      document: gql(getLanguage),
     ),
   );
   if (result.hasException) {

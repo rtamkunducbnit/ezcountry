@@ -1,10 +1,10 @@
-class Countrys {
+class Country {
   String code;
   String name;
   String? emoji;
   List<Language>? languages;
 
-  Countrys.fromJson(Map<String, dynamic> json)
+  Country.fromJson(Map<String, dynamic> json)
       : code = json["code"],
         name = json["name"],
         emoji = json["emoji"],

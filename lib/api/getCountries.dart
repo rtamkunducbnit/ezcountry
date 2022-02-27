@@ -1,14 +1,14 @@
-// returns a country with the given country code
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:graphql/client.dart';
 import '../models/model.dart';
-import '../queries/allcountry_query.dart';
+import '../queries/all_Country_Query.dart';
 import 'api.dart';
 
-  Future<List<Countrys>> getAllCountriesx() async {
+  Future<List<Country>> getCountry() async{
     var result = await client.query(
       QueryOptions(
-        document: gql(getAllCountries),
+        document: gql(getCountries),
       ),
     );
     if (result.hasException) {
@@ -16,9 +16,9 @@ import 'api.dart';
     }
     debugPrint(result.toString());
     var json = result.data!["countries"];
-    List<Countrys> countries = [];
+    List<Country> countries = [];
     for (var res in json) {
-      var country = Countrys.fromJson(res);
+      var country = Country.fromJson(res);
       countries.add(country);
     }
     return countries;

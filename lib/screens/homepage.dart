@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ezcountry/apicall/getAll_Languages.dart';
-import 'package:ezcountry/models/language_model.dart';
-import '../apicall/getallcountries.dart';
-import '../constant/app_text_constants.dart';
-import '../constant/color_constants.dart';
+import 'package:ezcountry/api/getAll_Languages.dart';
+import 'package:ezcountry/models/languageModel.dart';
+import '../api/getCountries.dart';
+import '../constant/app_Text_Constants.dart';
+import '../constant/colorConstants.dart';
 import '../controller/controller.dart';
 import '../models/model.dart';
 
@@ -21,16 +21,19 @@ class _HomePageState extends State<HomePage> {
   DropGetXContoller getControl = DropGetXContoller();
   String? selectedLanguage;
   var countries;
-  var alllanguages;
-  //search function
+  var all_Languages;
   var items = [];
-  var indexpostion = [];
+  var indexPosition = [];
+
+  //function to search country using country code
   Future<void> filterSearchResults(String query) async {
-    indexpostion.clear();
+    indexPosition.clear();
     List dummySearchList = [];
-    dummySearchList.addAll(countries);
+    dummySearchList.addAll(countries); //adding country data to a local list so that we can search country and the actual data not get effected
     if(query.isNotEmpty) {
       List dummyListData = [];
+
+      //finding matched country from the provided code
       for (var item in dummySearchList) {
         if(item.code.toString().toLowerCase()==query.toLowerCase()) {
           setState(() {
@@ -41,24 +44,23 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         items.clear();
         items.addAll(dummyListData);
-        indexpostion.clear();
+        indexPosition.clear();
         for(var i=0; i<items.length; i++){
           final index = dummySearchList.indexWhere((element) =>
           element.code == items[i].code);
-          indexpostion.add(index);
-          debugPrint(index.toString());
-
+          indexPosition.add(index);
         }
-        if(indexpostion.isEmpty){
+        if(indexPosition.isEmpty){
           getControl.changeErrorState(true);
-
         }else{
           getControl.changeErrorState(false);
         }
       });
       items.clear();
-      for(var i=0; i<indexpostion.length; i++){
-        items.add(countries[int.parse(indexpostion[i].toString())]);
+
+      //adding the searched result to a list
+      for(var i=0; i<indexPosition.length; i++){
+        items.add(countries[int.parse(indexPosition[i].toString())]);
       }
       return;
     } else {
@@ -68,24 +70,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<List<Languages>> futureLang = getAllLanguagex();
+  Future<List<Languages>> futureLang = getLanguages();
 
-  Future<List<Countrys>> future = getAllCountriesx();
+  Future<List<Country>> future = getCountry();
 
-
-
-  Future<void> Filter(String query) async {
-    indexpostion.clear();
+  //function to filter country on the basis of selected language
+  Future<void> filter(String query) async {
+    indexPosition.clear();
     List dummySearchList = [];
-    dummySearchList.addAll(countries);
-    debugPrint('myaaa'+dummySearchList.toString());
+    dummySearchList.addAll(countries);//adding country data to a local list so that we can search country and the actual data not get effected
     if(query.isNotEmpty) {
       List dummyListData = [];
       for (var item in dummySearchList) {
         debugPrint(item.languages.toString());
+
+        //finding matched country of the selected language
         for(var i=0; i<item.languages.length; i++) {
-          Language lang = item.languages![i];
-          if(lang.name.toString().toLowerCase()==query.toLowerCase()) {
+          Language language = item.languages![i];
+          if(language.name.toString().toLowerCase()==query.toLowerCase()) {
             setState(() {
               dummyListData.add(item);
             });
@@ -95,16 +97,18 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         items.clear();
         items.addAll(dummyListData);
-        indexpostion.clear();
+        indexPosition.clear();
         for(var i=0; i<items.length; i++){
           final index = dummySearchList.indexWhere((element) =>
           element.code == items[i].code);
-          indexpostion.add(index);
+          indexPosition.add(index);
         }
       });
       items.clear();
-      for(var i=0; i<indexpostion.length; i++){
-        items.add(countries[int.parse(indexpostion[i].toString())]);
+
+      //adding the searched result to a list
+      for(var i=0; i<indexPosition.length; i++){
+        items.add(countries[int.parse(indexPosition[i].toString())]);
       }
       return;
     } else {
@@ -126,7 +130,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget pickLanguage(
       BuildContext context, AsyncSnapshot<List<Languages>> snapshot) {
-    var alllanguages = snapshot.data;
+    var all_Languages = snapshot.data;
 
     if (snapshot.connectionState == ConnectionState.done) {
       return Container(
@@ -136,12 +140,12 @@ class _HomePageState extends State<HomePage> {
             labelText: "Filter Using Language",
             border: OutlineInputBorder(),
           ),
-          items: buildDropDownItem(alllanguages!),
+          items: buildDropDownItem(all_Languages!),
           value: selectedLanguage,
-          onChanged: (String? lang) {
+          onChanged: (String? language) {
             setState(() {
-              selectedLanguage = lang;
-              Filter(selectedLanguage!);
+              selectedLanguage = language;
+              filter(selectedLanguage!);
               debugPrint(selectedLanguage.toString());
             });
           },
@@ -154,14 +158,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget ListCountries(
-      BuildContext context, AsyncSnapshot<List<Countrys>> snapshot) {
+      BuildContext context, AsyncSnapshot<List<Country>> snapshot) {
     countries = snapshot.data;
 
     if (snapshot.connectionState == ConnectionState.done) {
       return items.isEmpty?ListView.builder(
           itemCount: countries!.length,
           itemBuilder: (BuildContext context, index){
-            Countrys project = snapshot.data![index];
+            Country project = snapshot.data![index];
             snapshot.data!.sort((a, b) => a.name.compareTo(b.name));
             return Padding(
               padding: const EdgeInsets.all(8.0),
@@ -268,7 +272,7 @@ class _HomePageState extends State<HomePage> {
       ListView.builder(
           itemCount: items.length,
           itemBuilder: (BuildContext context, index){
-            Countrys project = items[index];
+            Country project = items[index];
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: Card(
@@ -425,7 +429,7 @@ class _HomePageState extends State<HomePage> {
                           filterSearchResults(value);
                         }
                         else{
-                          indexpostion.clear();
+                          indexPosition.clear();
                           items.clear();
                           getControl.changeErrorState(false);
                         }
@@ -443,7 +447,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               Expanded(
-                child: FutureBuilder<List<Countrys>>(
+                child: FutureBuilder<List<Country>>(
                   future: future,
                   builder: (context, snapshot) {
                     return ListCountries(context, snapshot);
